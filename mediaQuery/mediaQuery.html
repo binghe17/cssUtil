@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>mediaQuery</title>
+    <script src="mediaQuery.js"></script>
+</head>
+<body>
+    bootstrap 自适应大小 现在窗口长宽在什么范围内？ (刷新)
+    <hr><pre>
+    <script>
+        function fun1(){
+            document.write('\n是否在xs范围内？',mediaQuery.match('xs'), window.innerWidth);
+            document.write('\n是否在sm范围内？',mediaQuery.match('sm'), window.innerWidth);
+            document.write('\n是否在md范围内？',mediaQuery.match('md'), window.innerWidth);
+            document.write('\n是否在md lg范围内？',mediaQuery.match('xs lg'), window.innerWidth);
+        }
+        fun1();
+        
+    </script>
+
+    
+</body>
+</html>

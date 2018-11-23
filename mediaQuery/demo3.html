@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>自适应大小触发JS (@media)</title>
+</head>
+<body>
+
+<p>If the viewport is less than, or equal to, 767 pixels wide, the background color will be yellow. If it is greater than 767, it will change to pink.</p>
+<p><strong>Resize the browser window to see the effect.</strong></p>
+
+<script>
+    //[注意]IE9-浏览器不支持，可以使用第三方函数库 https://github.com/paulirish/matchMedia.js/
+
+
+
+    function getMediaStatus() {
+        var screenSm = 768;
+        var screenMd = 992;
+        var screenLg = 1200;
+        var screenXsMax = screenSm - 1;//767
+        var screenSmMax = screenMd - 1;//991
+        var screenMdMax = screenLg - 1;//1199
+
+        if (window.matchMedia('(max-width: ' + screenXsMax + 'px)').matches) return 'xs';
+        else if (window.matchMedia('(min-width: ' + screenSm + 'px) and (max-width: ' + screenSmMax + 'px)').matches) return 'sm';
+        else if (window.matchMedia('(min-width: ' + screenMd + 'px) and (max-width: ' + screenMdMax + 'px)').matches) return 'md';
+        else if (window.matchMedia('(min-width: ' + screenLg + 'px)').matches) return 'lg';
+        
+    }
+    console.log(getMediaStatus(), window.innerWidth)
+
+    // x.addListener(myFunction);
+    // x.removeListener(myFunction);
+    
+</script>
+
+</body>
+</html>
