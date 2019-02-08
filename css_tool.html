@@ -1,0 +1,56 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CSS-TOOL</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+    <style>
+        textarea {width:100%; height:300px;}
+    </style>
+    
+</head>
+<body>
+    <h3>나의 CSS 툴</h3>
+    CSS수정전:<br>
+    <textarea id='text1' >
+		.footer_wrap {
+			position: relative;
+			z-index: 1;
+			clear: both;
+			width: 100%;
+			margin: 15px 0 0 0;
+			background-color: #eee
+		}
+
+		.footer_wrap .area_terms {
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			height: 46px;
+			padding: 8px 0;
+			background-color: #fff
+		}
+</textarea><br>
+    CSS수전후:<br>
+    <textarea id='text2' ></textarea><br>
+    <button id='changeBtn' title="펼쳐진 스타일 속성을 접기"> 여러행을 한행으로 접기 </button>
+    <script>
+
+    $('#changeBtn').click(function(){
+        let str = $('#text1').val();
+        str = str.replace(/\t/g,'');
+        str = str.replace(/\n/g,'');
+        str = str.replace(/;/g,'; ');
+        str = str.replace(/}/g,' }\n');
+        console.log(str)
+
+        $('#text2').val(str);
+    })
+
+    </script>
+
+</body>
+</html>
