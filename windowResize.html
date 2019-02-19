@@ -1,0 +1,14 @@
+
+<div id="result"></div>
+<style> #result {width:100px; height:100px; border:1px solid #333; background:#ccc; color:#fff;}</style>
+<script src="https://code.jquery.com/jquery-1.12.4.min.js" ></script>
+<script>
+
+    $(function(){
+        $('#result').html( window.innerWidth +'x'+ window.innerHeight )
+        $(window).resize(function() {
+            $('#result').html( window.innerWidth +'x'+ window.innerHeight )
+        });
+    })
+
+</script>
