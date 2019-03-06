@@ -210,16 +210,105 @@ function btn4(){//stop
     <div id="rebox2"></div>
     <div id="rebox"></div>
 </pre>
-<button onclick="exp_refreshFor()">refreshFor()</button>
+<button onclick="exp_refreshFor()">exp_refreshFor()</button>
+
 <script>
+
+
+refreshFun(function(){
+    console.log('1111');
+})
+refreshFun(function(){
+    console.log('2222');
+    // for (let i = 0; i < 400000; i++) {//대략 5초 동안 일함. (화면 끊김현상 있음)[동기]
+    //     $('#rebox').html(i +'/'+ 100)
+    // }
+    refreshFor(0, 50, function(i,leng){//[비동기]
+        rebox2.innerHTML = (i+1) +'/'+ leng ; 
+    },50)
+
+})
+refreshFun(function(){
+    console.log('3333');
+})
+
+waitFun()
+
+
+//실행할 리스트
+function refreshFun(callback){//비동기로 실행할 로직을 대기만 한다. 
+    if(typeof window.fun == 'undefined') fun = {}
+    if(typeof window.timeList == 'undefined')  timeList = [];
+    let leng=timeList.length;
+    name = 'timeFun_'+timeList.length;
+    fun[name] = callback;
+    timeList.push([name,false]);
+    // console.log(fun[name], timeList, leng )
+}
+// fun.A()
+// fun.B()
+
+// console.log(timeList)
+
+//실행
+function waitFun(){//순차적으로 실행
+    let runname = timeList[0][0];
+    if(timeList.length == 0 || typeof fun[runname] == 'undefined' ) return;
+    // console.log(timeList[0][0], timeList[0][1], typeof fun[runname], timeList.length)
+    runTimer = setInterval(function(){
+        console.log('----------',timeList.length)
+        if(timeList.length == 0 ){//모든 할일을 다 했을때
+            clearInterval(runTimer);//더 이상 탐지 하지 않는다.
+            delete timeList;
+            delete fun;
+        } else {//해야할 임무가 있을때
+            runname = timeList[0][0];
+            if(timeList[0][1] ==false && timeList[0][0] == runname){//실행중이 아니면 실행
+                // console.log('실행중이 아니면')
+                timer = setTimeout(function(){
+                    timeList[0][1] = true;//현재 실행중입니다.
+                    fun[runname]();//함수실행
+                    delete fun[runname];//다실행하고 지움
+                    timeList.shift();
+                });//딜레이 없이 바로실행
+            }else{//실행중이 이면 아무것도 안함.
+                // console.log('실행중입니다.')
+            }
+        }
+    },20);//ms간격으로 끝났는지 여부 확인해본다. (너무 짧으면 Uncaught ReferenceError: timeList is not defined 에러날수 있음)
+}
+
+
+
+
+
+
+
+
+//---------------
+
+
+//예제
 function exp_refreshFor(){
-    refreshFor(0, 3, function(i,leng){
-        $(rebox).append( 'A__'+ (i+1)+'/'+ leng +'<br>');
-        refreshFor(0, 5, function(j,leng2){
-            $(rebox).append('   B__'+ (j+1) +'/'+ leng2 +'<br>')
-            rebox2.innerHTML = (i+1) +'/'+ leng +'_'+ (j+1) + '/'+ leng2 +'_'+ ((i+1)*j); 
-        })
-    },100);//예측시간
+    refreshFun(function(){//순차적으로 기다림.
+        refreshFor(0, 3, function(i,leng){
+
+            $(rebox).append( 'A__'+ (i+1)+'/'+ leng +'<br>');
+
+            refreshFun(function(){//순차적으로 기다림.
+                refreshFor(0, 5, function(j,leng2){
+
+                    $(rebox).append('   B__'+ (j+1) +'/'+ leng2 +'<br>')
+                    rebox2.innerHTML = (i+1) +'/'+ leng +'_'+ (j+1) + '/'+ leng2 +'_'+ ((i+1)*j); 
+
+                })
+            })
+            waitFun()
+            
+
+        },100);//예측시간
+    })
+    waitFun()
 }
 
 
