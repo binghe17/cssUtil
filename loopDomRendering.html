@@ -1,3 +1,5 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+
 <h3>dom渲染频繁，解决页面卡顿。</h3>
 <p>渲染结果：<b id="myDiv">0</b></p>
 <button onclick="btn0()">btn0 卡顿</button>
@@ -10,6 +12,8 @@
 </div>
 
 <script>
+//---------------------------
+
 //IE9 严格兼容
 // if(!window.requestAnimationFrame){
 //     var lastTime = 0;
@@ -28,39 +32,50 @@
 //         clearTimeout(id);
 //     };
 // }
-
 // setTimeout()：在特定的时间后执行函数，而且只执行一次，如果在特定时间前想取消执行函数，
 // 可以用clearTimeout立即取消执行。但是并不是每次执行setTimeout都会在特定的时间后执行，
 // 页面加载后js会按照主线程中的顺序按序执行那个，如果在延迟时间内主线程不空闲，setTimeout
 // 里面的函数是不会执行的，它会延迟到主线程空闲时才执行。
-
 // setInterval()：在特定的时间间隔内重复执行函数，除非主动清除它，不然会一直执行下去，
 // 清除函数可以使用clearInterval。setInterval也会等到主线程空闲了再执行，但是setInterval
 // 去排队时，如果发现自己还在队列中未执行，就会被drop掉，所以可能会造成某段时间的函数未被执行。
-
 // requestAnimationFrame()：它不需要设置时间间隔，它会在浏览器每次刷新之前执行回调函数的任务。
 // 这样我们动画的更新就能和浏览器的刷新频率保持一致。requestAnimationFrame在运行时，浏览器会自动
 // 优化方法的调用，并且如果页面不是激活状态下的话，动画会自动暂停，有效节省了CPU开销。
 
+//---------------------------
 
 const myDiv = document.getElementById('myDiv')
 let temp;
 let timer;
 
-//卡顿，最后一次渲染输出
+
+//----------------------------卡顿，(最后渲染一次输出)
 function btn0(){
     temp = 0;
+
     for (let i = 0; i < 500000; i++) {//同步速度快。（3秒左后会卡，什么操作也做不了。主线程被堵塞了）
         temp = i;
-        myDiv.innerHTML=temp;//太快了，渲染不了。卡，最终输出最后的结果。
+        // myDiv.innerHTML=temp;//太快了，渲染不了。卡，最终输出最后的结果。
+        if(i%10000==0){
+            console.log(i)
+            // myDiv.style.display = 'none';
+            // myDiv.style.display = 'block';
+            // forceRedraw(myDiv)
+            myDiv.innerHTML=temp;
+            refresh(myDiv)
+            
+        } 
+
     }
 }
+
+
 function btn00(){
     let timer1, timer2;
     temp = 0;
     count=300;//计算300次
     delayOut = 100;//抽样输出间隔
-
     console.time('btn00')
     clearInterval(timer1);
     clearInterval(timer2);
@@ -73,7 +88,6 @@ function btn00(){
             clearInterval(timer1);//终止循环
         }
     });
-
     //抽样渲染
     timer2 = setInterval(function fn(){//无限循环    
         // console.log(temp);       //!!
@@ -85,10 +99,12 @@ function btn00(){
     }, delayOut);
 }
 
-//实时更新数据
+
+//---------------------不卡，（实时更新数据）
+
 function btn1() {//setTimeout 延迟执行一次
     let temp = 0;
-    let delay = 16;//延迟16毫秒
+    let delay = 0;//延迟16毫秒
     let count = 300; //渲染300次
     console.time('setTimeout')
     clearInterval(timer);
@@ -102,8 +118,9 @@ function btn1() {//setTimeout 延迟执行一次
             clearTimeout(timer);//终止循环
         }
     }, delay);
-
 }
+
+
 function btn2() {//setInterval 延迟无限循环
     let temp = 0;
     let count = 300; //渲染300次
@@ -117,37 +134,133 @@ function btn2() {//setInterval 延迟无限循环
             clearInterval(timer);//终止循环
         }
     });
-
 }
+
 
 function btn3(){//requestAnimationFrame (逐帧无限执行，无延迟)
-    let temp = 0;
-    let count = 300; //渲染300次
-    console.time('requestAnimationFrame')
-    cancelAnimationFrame(timer);
-    timer = requestAnimationFrame(function fn(){
-        myDiv.innerHTML = temp + 1;         //!!dom操作
-        temp=parseInt(myDiv.innerHTML);     //!!
-        if(temp < count){
-            timer = requestAnimationFrame(fn);
-        }else{
-            console.timeEnd('requestAnimationFrame')
-            cancelAnimationFrame(timer);
-        }
-    });
+    // let temp = 0;
+    // let count = 300; //渲染300次
+    // console.time('requestAnimationFrame')
+    // cancelAnimationFrame(timer);
+    // timer = requestAnimationFrame(function fn(){
+    //     myDiv.innerHTML = temp + 1;         //!!dom操作
+    //     temp=parseInt(myDiv.innerHTML);     //!!
+    //     if(temp < count){
+    //         timer = requestAnimationFrame(fn);
+    //     }else{
+    //         console.timeEnd('requestAnimationFrame')
+    //         cancelAnimationFrame(timer);
+    //     }
+    // });
+    rendering(function(n){
+        myDiv.innerHTML = parseInt(myDiv.innerHTML) + 1
+    },1)
+
 }
+
+        function rendering(callback, count=100){//requestAnimationFrame (逐帧无限执行，无延迟)
+            let temp = 0;
+            // console.time('requestAnimationFrame')
+            cancelAnimationFrame(timer);
+            timer = requestAnimationFrame(function fn(){
+                if(temp < count){
+                    timer = requestAnimationFrame(fn);
+                    callback(temp);
+                    temp++;
+                    // console.log(temp)
+                }else{
+                    // console.timeEnd('requestAnimationFrame')
+                    cancelAnimationFrame(timer);
+                }
+            });
+        }
+        // rendering(function(n){
+        //     myDiv.innerHTML = n+1
+        // },100)
+        // rendering(function(n){
+        //     myDiv.innerHTML = parseInt(myDiv.innerHTML) + 1
+        // },1)
+
+
+
 
 function btn4(){//stop
     clearTimeout(timer);
     clearInterval(timer);
     cancelAnimationFrame(timer);
 }
-
 //结果：
 // 23:33:53.421 loopdom.html:115 setInterval: 1192.746826171875ms
 // 23:34:00.679 loopdom.html:133 requestAnimationFrame: 4979.468994140625ms
 // 23:34:09.389 loopdom.html:100 setTimeout: 5114.701904296875ms
 
+
+
+
+
+
+
+//------------------------------下面是 推荐的方法---------------------------------------
 </script>
+
+
+<hr>
+<pre>
+    推荐方法：
+    <div id="rebox2"></div>
+    <div id="rebox"></div>
+</pre>
+<button onclick="exp_refreshFor()">refreshFor()</button>
+<script>
+function exp_refreshFor(){
+    refreshFor(0, 3, function(i,leng){
+        $(rebox).append( 'A__'+ (i+1)+'/'+ leng +'<br>');
+        refreshFor(0, 5, function(j,leng2){
+            $(rebox).append('   B__'+ (j+1) +'/'+ leng2 +'<br>')
+            rebox2.innerHTML = (i+1) +'/'+ leng +'_'+ (j+1) + '/'+ leng2 +'_'+ ((i+1)*j); 
+        })
+    },100);//예측시간
+}
+
+
+//(DOM 강제 렌더링) (模拟for语句)
+function refreshFor( n=0, count=100, callback, delay=0) { //n=i , count=length
+    let consoletime = 'setTimeout_'+n+'/'+count+'_'+delay;
+    console.time(consoletime);//시간기록
+    timer = setTimeout(function fn(){//한번실행
+        if(n < count){
+            callback(n, count);
+            timer = setTimeout(fn, delay);//재실행
+        }
+        else{
+            clearTimeout(timer);//끝내기.
+            console.timeEnd(consoletime);//기록한시간출력. (delay설정방법: 여러번 테스트후의 예측시간 이상으로 설정해주기)
+        }
+        n++;
+    }, delay);
+}
+
+//------
+// function refreshFor2( n=0, count=100, callback, delay=0) {
+//     let consoletime = 'setInterval_'+n+'/'+count+'_'+delay;
+//     console.time(consoletime);//시간기록
+//     timer = setInterval(function fn(){//한번실행
+//         if(n < count){
+//             callback(n, count);
+//         }else{
+//             clearInterval(timer);//끝내기.
+//             console.timeEnd(consoletime);//기록한시간출력. (delay설정방법: 여러번 테스트후의 예측시간 이상으로 설정해주기)
+//         }
+//         n++;
+//     }, delay);
+// }
+//------
+// requestAnimationFrame방식은 delay설정을 할수 없어서 복측구조실행은 안됨.
+//------
+
+
+</script>
+
+
 
 
