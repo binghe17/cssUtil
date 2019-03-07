@@ -431,9 +431,8 @@ function runWait(){//순차적으로 실행
             } else {//해야할 임무가 있을때
                 runname = timeList[0][0];
                 if(timeList[0][1] ==false && timeList[0][0] == runname){//실행중이 아니면 실행
-                    // console.log('실행중이 아니면')
+                    timeList[0][1] = true;//현재 실행중으로 바꿈
                     timer = setTimeout(function(){
-                        timeList[0][1] = true;//현재 실행중입니다.
                         console.log(runname)
                         fun[runname]();//함수실행
                         delete fun[runname];//다실행하고 지움
@@ -532,4 +531,5 @@ function forDom( n=0, count=100, callback, delay=0) { //n=i , count=length
 
 
 </script>
+
 
