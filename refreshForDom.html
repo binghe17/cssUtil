@@ -1,6 +1,6 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 
-<h3>dom渲染频繁，解决页面卡顿。</h3>
+<h3>dom渲染频繁，解决页面卡顿。refresh</h3>
 <p>渲染结果：<b id="myDiv">0</b></p>
 <button onclick="btn0()">btn0 卡顿</button>
 <button onclick="btn00()">btn00 抽样渲染</button>
@@ -12,6 +12,9 @@
 </div>
 
 <script>
+
+
+
 //---------------------------
 
 //IE9 严格兼容
@@ -210,33 +213,192 @@ function btn4(){//stop
     <div id="rebox2"></div>
     <div id="rebox"></div>
 </pre>
-<button onclick="exp_refreshFor()">exp_refreshFor()</button>
+<button onclick="exp_forDom()">exp_forDom()</button>
+<button onclick="exp_forDom2()">exp_forDom2()</button>
 
 <script>
 
 
-refreshFun(function(){
-    console.log('1111');
-})
-refreshFun(function(){
-    console.log('2222');
-    // for (let i = 0; i < 400000; i++) {//대략 5초 동안 일함. (화면 끊김현상 있음)[동기]
-    //     $('#rebox').html(i +'/'+ 100)
-    // }
-    refreshFor(0, 50, function(i,leng){//[비동기]
-        rebox2.innerHTML = (i+1) +'/'+ leng ; 
-    },50)
+//异步转同步
+async function afn2(...fs) {
+	let s = afn2.s;
+	s.push(...fs.filter(f => typeof f === 'function'))
+	if (afn2.b) {
+		return Promise.resolve(true);
+	}
+	afn2.b = true
+	let f, v, m;
+	while (f = s.shift()) {
+		v = await new Promise((yes, no) => {
+			m = { yes, no }
+			Reflect.apply(f, m, [v])
+		})
+	}
+	afn2.b = false
+	return v
+}
+afn2.b = false
+Object.defineProperty(afn2, 's', { value: [], enumerable: true })
 
-})
-refreshFun(function(){
-    console.log('3333');
+
+// // test
+// {
+// 	console.time('afn')
+
+// 	ao=afn2(
+// 		function () {
+// 			console.log('------start 1') //11111111 출력순서
+// 			setTimeout(() => {
+// 				this.yes(1)
+// 			}, 1000)
+// 		},
+// 		function (v) {
+// 			console.log('------start 2') //444444444
+// 			setTimeout(() => {
+// 				console.log(v) //5555555555
+// 				this.yes(2)
+// 			}, 1000)
+// 		},
+// 		function (v) {
+// 			console.log('------start 3') //66666666666
+// 			setTimeout(() => {
+// 				console.log(v) //7777777777
+// 				// this.no(3)
+// 				this.yes(3) 
+				
+// 			}, 1000)
+// 		}
+//     )
+//     console.log('=================')//222222222222
+//     ao.then(
+//         function (v){
+//             console.log('------start asdf3rwefasdfasdf-------') //13 13 13 
+//             setTimeout(()=>{ 
+//                 // this.yes(3) //14 14 end, 
+//             },1000)
+//         },
+//     )
+
+// 	setTimeout(() => {//222222222222
+//         afn2(
+// 			function (v){
+// 				console.log('------start 4------asdfa-------') //888888888
+// 				setTimeout(()=>{ 
+
+
+//                     afn2(
+//                         function (v){
+//                             console.log('------start 1234512341234-------') //12 12 12 
+//                             setTimeout(()=>{ 
+
+//                                 this.yes(4)
+//                             },1000)
+//                         },
+//                     )
+
+
+// 					this.yes(4)
+// 				},1000)
+// 			},
+// 		)
+
+// 		afn2(
+// 			function (v){
+// 				console.log('------start 4') //9999999
+// 				setTimeout(()=>{ 
+// 					this.yes(4)
+// 				},1000)
+// 			},
+// 			function (v){
+// 				console.log('------start 5') //10 10 10 
+// 				setTimeout(()=>{
+// 					this.yes(5)
+// 					console.timeEnd('afn') //11 11 11
+// 				},1000)
+// 			},
+// 		).then(v=>console.log('------ending',v)) //33333333
+// 	}, 500)
+// }
+
+
+//------------
+
+
+
+
+afn2(function () {
+    let self = this;
+
+    waitDom(function(){//step1
+        console.log('1111');
+    })
+    //위에는 추가만 함
+    runWait();//20ms마다 리스트의 임무가 있는지 판단하고 실행하기에 아래것도 따라서 같이 실행해주는것이 가능한것임. (위에것까지만 실행하는것이 아님.)
+    //아래부터 추가하면서 실행됨 (20ms내에 추가 된것이 없을때 까지.)
+    waitDom(function(){//step2
+        console.log('2222');
+        // for (let i = 0; i < 400000; i++) {//대략 5초 동안 일함. (화면 끊김현상 있음)[동기]
+        //     $('#rebox').html(i +'/'+ 100)
+        // }
+        forDom(0, 50, function(i,leng){//[비동기]
+            rebox.innerHTML = (i+1) +'/'+ leng ; 
+        },50)
+    })
+    waitDom(function(){//step3
+        console.log('3333');
+    })
+
+    waitDom(()=> self.yes());//다음 afn1으로 가기
+
+});
+
+
+
+afn2(function () {
+    let self = this;
+    console.log('----1-----');
+    waitDom(function(){
+        console.log('555555555')
+        for (let i = 0; i < 30; i++) {
+            waitDom(function(){
+                for (let j = 0; j < 5; j++) {
+                    rebox2.innerHTML = (i+1) +'/'+ 30 ; 
+                    console.log(i,3, '----', j, 5)
+                }
+            })
+        }
+        waitDom(()=> self.yes());//다음 afn1으로 가기
+
+    });
+    // runWait();//실행
+    // runWait();//무시
 })
 
-waitFun()
+afn2(function (){
+    let self = this;
+    console.log('---2222222-----');
+    waitDom(function(){
+        for (let i = 0; i < 30; i++) {
+            waitDom(function(){
+                for (let j = 0; j < 5; j++) {
+                    rebox2.innerHTML = (i+1) +'/'+ 30 ; 
+                    console.log(i,3, '----', j, 5)
+                }
+            })
+        }
+        // waitDom(()=> self.yes());//다음 afn1으로 가기
+    });
+    // runWait();//실행
+})
+
+
+
+
+
 
 
 //실행할 리스트
-function refreshFun(callback){//비동기로 실행할 로직을 대기만 한다. 
+function waitDom(callback){//비동기로 실행할 로직을 대기만 한다. 
     if(typeof window.fun == 'undefined') fun = {}
     if(typeof window.timeList == 'undefined')  timeList = [];
     let leng=timeList.length;
@@ -251,31 +413,38 @@ function refreshFun(callback){//비동기로 실행할 로직을 대기만 한�
 // console.log(timeList)
 
 //실행
-function waitFun(){//순차적으로 실행
-    let runname = timeList[0][0];
-    if(timeList.length == 0 || typeof fun[runname] == 'undefined' ) return;
-    // console.log(timeList[0][0], timeList[0][1], typeof fun[runname], timeList.length)
-    runTimer = setInterval(function(){
-        console.log('----------',timeList.length)
-        if(timeList.length == 0 ){//모든 할일을 다 했을때
-            clearInterval(runTimer);//더 이상 탐지 하지 않는다.
-            delete timeList;
-            delete fun;
-        } else {//해야할 임무가 있을때
-            runname = timeList[0][0];
-            if(timeList[0][1] ==false && timeList[0][0] == runname){//실행중이 아니면 실행
-                // console.log('실행중이 아니면')
-                timer = setTimeout(function(){
-                    timeList[0][1] = true;//현재 실행중입니다.
-                    fun[runname]();//함수실행
-                    delete fun[runname];//다실행하고 지움
-                    timeList.shift();
-                });//딜레이 없이 바로실행
-            }else{//실행중이 이면 아무것도 안함.
-                // console.log('실행중입니다.')
+function runWait(){//순차적으로 실행
+    if(typeof isRunTimer == 'undefined'){
+        if(typeof timeList == 'undefined') return; 
+        if(timeList.length == 0 ) return;
+        isRunTimer = true;
+        let runname = timeList[0][0];
+        if(typeof fun[runname] == 'undefined' ) return;
+        // console.log(timeList[0][0], timeList[0][1], typeof fun[runname], timeList.length)
+        runTimer = setInterval(function(){
+            // console.log('----------',timeList.length)
+            if(timeList.length == 0 ){//모든 할일을 다 했을때
+                delete isRunTimer;
+                delete timeList;
+                delete fun;
+                clearInterval(runTimer);//더 이상 탐지 하지 않는다.
+            } else {//해야할 임무가 있을때
+                runname = timeList[0][0];
+                if(timeList[0][1] ==false && timeList[0][0] == runname){//실행중이 아니면 실행
+                    // console.log('실행중이 아니면')
+                    timer = setTimeout(function(){
+                        timeList[0][1] = true;//현재 실행중입니다.
+                        console.log(runname)
+                        fun[runname]();//함수실행
+                        delete fun[runname];//다실행하고 지움
+                        timeList.shift();
+                    });//딜레이 없이 바로실행
+                }else{//실행중이 이면 아무것도 안함.
+                    // console.log('실행중입니다.')
+                }
             }
-        }
-    },20);//ms간격으로 끝났는지 여부 확인해본다. (너무 짧으면 Uncaught ReferenceError: timeList is not defined 에러날수 있음)
+        },20);//ms간격으로 끝났는지 여부 확인해본다. (너무 짧으면 Uncaught ReferenceError: timeList is not defined 에러날수 있음)
+    }
 }
 
 
@@ -288,32 +457,39 @@ function waitFun(){//순차적으로 실행
 //---------------
 
 
-//예제
-function exp_refreshFor(){
-    refreshFun(function(){//순차적으로 기다림.
-        refreshFor(0, 3, function(i,leng){
+//예제1, 예측시간을 쓰지 않으면 생각외 에러. (비추 방식)
+function exp_forDom(){
+    forDom(0, 3, function(i,leng){
+        $(rebox).append( 'A__'+ (i+1)+'/'+ leng +'<br>');
 
-            $(rebox).append( 'A__'+ (i+1)+'/'+ leng +'<br>');
+            forDom(0, 5, function(j,leng2){
+                $(rebox).append('   B__'+ (j+1) +'/'+ leng2 +'<br>')
+                rebox2.innerHTML = (i+1) +'/'+ leng +'_'+ (j+1) + '/'+ leng2 +'_'+ ((i+1)*j); 
+            })
 
-            refreshFun(function(){//순차적으로 기다림.
-                refreshFor(0, 5, function(j,leng2){
+    },100);//100ms,예측시간보다 작을시 에러
+}
+//예제2, 예측시간이 필요없으며 속도 더 빠름. 20ms (추천 방식)
+function exp_forDom2(){
+    waitDom(function(){
+        for (let i = 0, leng=3; i < leng; i++) {
+            waitDom(function(){
 
+                $(rebox).append( 'A__'+ (i+1)+'/'+ leng +'<br>');
+                for (let j = 0, leng2=5; j < leng2; j++) {
                     $(rebox).append('   B__'+ (j+1) +'/'+ leng2 +'<br>')
                     rebox2.innerHTML = (i+1) +'/'+ leng +'_'+ (j+1) + '/'+ leng2 +'_'+ ((i+1)*j); 
+                }
 
-                })
             })
-            waitFun()
-            
-
-        },100);//예측시간
+        }
     })
-    waitFun()
+    runWait()
 }
 
 
 //(DOM 강제 렌더링) (模拟for语句)
-function refreshFor( n=0, count=100, callback, delay=0) { //n=i , count=length
+function forDom( n=0, count=100, callback, delay=0) { //n=i , count=length
     let consoletime = 'setTimeout_'+n+'/'+count+'_'+delay;
     console.time(consoletime);//시간기록
     timer = setTimeout(function fn(){//한번실행
@@ -330,7 +506,7 @@ function refreshFor( n=0, count=100, callback, delay=0) { //n=i , count=length
 }
 
 //------
-// function refreshFor2( n=0, count=100, callback, delay=0) {
+// function forDom2( n=0, count=100, callback, delay=0) {
 //     let consoletime = 'setInterval_'+n+'/'+count+'_'+delay;
 //     console.time(consoletime);//시간기록
 //     timer = setInterval(function fn(){//한번실행
@@ -348,8 +524,12 @@ function refreshFor( n=0, count=100, callback, delay=0) { //n=i , count=length
 //------
 
 
+
+//------------------------------------------
+
+
+
+
+
 </script>
-
-
-
 
