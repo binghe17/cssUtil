@@ -1,0 +1,29 @@
+<h1>iframe auto resize demo</h1>
+
+<div id="wrap">
+    <p>Text Text</p>
+    <p>Text Text</p>
+    <p>Text Text</p>
+    <p>Text Text</p>
+    <iframe data-attach-video="" width="860" height="490" src="http://www.youtube.com/embed/FcgXHJSghJA" frameborder="0" allowfullscreen=""></iframe>
+    <p>Text Text</p>
+    <p>Text Text</p>
+    <p>Text Text</p>
+    <p>Text Text</p>
+    <iframe data-attach-video="" width="860" height="490" src="http://www.youtube.com/embed/Y-JQ-RCyPpQ" frameborder="0" allowfullscreen=""></iframe>
+    <p>Text Text</p>
+    <p>Text Text</p>
+    <p>Text Text</p>
+    <p>Text Text</p>
+
+</div>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<style>
+    .iframebox { position: relative; width: 100%; padding-bottom: 56.25%; }
+    .iframebox iframe { position: absolute; width: 100%; height: 100%; }
+</style>
+<script>
+    $('#wrap iframe').wrap('<div class="iframebox"></div>');
+</script>
