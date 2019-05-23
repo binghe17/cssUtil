@@ -1,0 +1,125 @@
+
+JavaScript获取图片的原始尺寸
+<div id="imgBox">
+    <!-- <img id="image1" src="http://semvill.diskn.com/1RzQjpuSLO" style="width:100%;" />-->
+    <img id="image1" src="https://via.placeholder.com/800x334/777/fff.png?text=800x334" style="width:100%;" /> 
+</div>
+<style>
+body {margin:0;}
+#imgBox {height:300px; overflow: hidden; margin:0 auto; background:#ccc;}
+/* #image1 {min-width:1280px;} */
+</style>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script>
+
+
+
+$(function(){
+    window.imgW = $('#image1').get(0).style.width;
+    window.imgH = $('#image1').get(0).style.height;
+    console.log(imgW, imgH);
+    $('#image1').css({'width':'unset', 'height':'unset'})
+    setTimeout(function (){
+
+        window.oWidth =  $('#image1').get(0).width;
+        window.oHeight =  $('#image1').get(0).height;
+        console.log(oWidth, oHeight)
+        // $('#image1').get(0).style.width = window.imgW;
+
+        imgResizeHeight();
+        $(window).resize(imgResizeHeight);        
+    },200)
+});
+
+
+function imgResizeHeight(){
+    if(window.innerWidth >= oWidth){ //400 모바일보다 클떄
+        let pp = oHeight / oWidth;
+        let reWidth = window.innerWidth;
+        let reHeight = window.innerWidth * pp;
+
+        console.log(window.innerWidth, window.innerHeight,'----', oWidth, oHeight, '---',pp, reWidth, reHeight)
+        $('#image1').parent().css('height', reHeight); 
+        $('#image1').css({'width':reWidth, 'height': reHeight})
+        
+    }
+
+}
+
+
+// 获取图片真实高度
+// function getImageWidth(url,callback){
+//     var img = new Image();
+//     img.src = url;
+//     if(img.complete){// 如果图片被缓存，则直接返回缓存数据
+//         callback(img.width, img.height);
+//     }else{
+//         img.onload = function(){
+//             callback(img.width, img.height);
+//         }
+//     }
+// }
+
+// $(function(){
+//     var imgSrc = $("#image1").attr("src");
+//     getImageWidth(imgSrc,function(w,h){
+//         window.img1 = {width:w,height:h};
+//         console.log(img1);
+
+//     });
+
+//     imgResizeHeight();
+//     $(window).resize(imgResizeHeight);       
+
+// });
+
+// function imgResizeHeight(){
+//     if(window.innerWidth > img1.width){ //ㅎ
+//         let bire = img1.height / img1.width;//height bire
+//         // let reHeight  = window.innerWidth * bire; 
+//         let reWidth =  $('#image1').get(0).width;
+//         let reHeight =  $('#image1').get(0).width * bire;
+
+//         // console.log(window.innerWidth, window.innerHeight, img1, $('#image1').get(0).width, $('#image1').get(0).height, '---',bire, reWidth, reHeight)
+//         $('#image1').parent().css('height', reHeight); 
+        
+//     }
+
+// }
+// ---------------------cafe24용
+//자동 이미지 높이 조절
+// $(function(){
+//     window.img1oH = $('.bxslider').css('height')
+//     window.img1 = {width:800, height:334} //수정할곳: 이미지 기본사이즈
+//     imgResizeHeight();
+//     $(window).resize(imgResizeHeight); 
+// });
+    
+// function getImageWidth(url,callback){
+//     img = new Image();
+//     img.src = url;
+//     if(img.complete){//캐시
+//         callback(img.width, img.height);
+//     }else{
+//         img.onload = function(){
+//             callback(img.width, img.height);
+//         }
+//     }
+// }
+
+// function imgResizeHeight(){
+//     if(window.innerWidth > 500){
+//         let pp = img1.height / img1.width; 
+//         let reWidth =  window.innerWidth;
+//         let reHeight =  window.innerWidth * pp;
+//         $('.bxslider img, .bxslider').css('height', reHeight +'px'); 
+//     }else{
+//         $('.bxslider img, .bxslider').css('height', img1oH); 
+// 	}
+// }
+
+
+
+</script>
+
