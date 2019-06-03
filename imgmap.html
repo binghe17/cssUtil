@@ -1,0 +1,109 @@
+<div id="wrap">
+    <div>
+        <h1>img map -> imgdiv pointdiv</h1>
+    </div>
+
+    <div id="coupon_imgmap">
+    
+        <div class="coupon_layer">
+            <img src="imgmap.jpg">
+        </div>
+        <div class="coupon_layer">
+            <div id="coupon1"><a href="#a" target="_blank"></a></div>
+            <div id="coupon2"><a href="#b" target="_blank"></a></div>
+            <div id="coupon3"><a href="#c" target="_blank"></a></div>
+        </div>
+    
+        <!-- 옛날방식
+        <img src="http://semvill.diskn.com/addonshop_event/renewal%20EVENT/Event_03_detail.jpg" usemap="#001" border="0">
+        <map name="001">
+        <area shape="rect" coords="298,345,700,595" href="#a" target="_blank">
+        <area shape="rect" coords="110,640,442,856" href="#b" target="_blank">
+        <area shape="rect" coords="560,640,890,850" href="#c" target="_blank">
+        </map> -->
+    
+    </div>
+</div>
+
+
+<style>
+    #wrap {padding:10px;}
+    /* area {border:1px solid #ccc;} */
+    * {padding:0; margin:0; }
+    #coupon_imgmap { padding:0; margin: 0 auto; height:1245px; width:1000px; }
+    #coupon_imgmap a {width:100%; height:100%; display: block; text-align:center;}
+    #coupon_imgmap a:hover {border:1px solid #ccc;}
+    #coupon_imgmap .coupon_layer {position: absolute;}
+    /* #coupon1, #coupon2, #coupon3 {border: 1px solid #ccc;} */
+    #coupon_imgmap #coupon1 { position: absolute; left: 302px; top: 343px; width: 395px; height: 248px;}
+    #coupon_imgmap #coupon2 { position: absolute; left: 112px; top: 640px; width: 329px; height: 210px;}
+    #coupon_imgmap #coupon3 { position: absolute; left: 558px; top: 640px; width: 328px; height: 210px;}
+
+</style>
+
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script>
+
+    //자동 이미지 높이 조절, 이미지 맵 포인트 추가
+    $(function(){
+        // if(mobileWeb == true){//cafe24모바일 여부
+            window.img1 = {
+                width: parseInt($('#coupon_imgmap').css('width')), 
+                height: parseInt($('#coupon_imgmap').css('height')),
+                fix: 20
+            }
+           
+            setTimeout(function(){
+                imgResizeHeight();
+            },200)
+            $(window).resize(imgResizeHeight); 
+        // }
+    });
+    function imgResizeHeight(){
+        fix = img1.fix || 0;
+        if(window.innerWidth < img1.width){
+            let pp = img1.height / img1.width; 
+            let reWidth =  window.innerWidth - fix;
+            let reHeight =  reWidth * pp;
+            $('#coupon_imgmap').css('width','auto');
+            // console.log(img1, reWidth, reHeight)
+            $('#coupon_imgmap img, #coupon_imgmap').css('height', reHeight +'px'); 
+            imgper(img1.width, img1.height, reWidth, reHeight, '#coupon1');//
+            imgper(img1.width, img1.height, reWidth, reHeight, '#coupon2');//
+            imgper(img1.width, img1.height, reWidth, reHeight, '#coupon3');//
+
+        }else{
+            // console.log('1111111')
+            $('#coupon_imgmap').css('width', img1.width +'px');
+            $('#coupon_imgmap img, #coupon_imgmap').css('height', img1.height +'px'); 
+            imgper(img1.width, img1.height, img1.width, img1.height, '#coupon1');//
+            imgper(img1.width, img1.height, img1.width, img1.height, '#coupon2');//
+            imgper(img1.width, img1.height, img1.width, img1.height, '#coupon3');//
+        }
+    } 
+    //반응형 웹에서도 이미지 맵 포인트가 정확하도록. (포인트도 비례 축소)
+    function imgper(imgWidth, imgHeight, winWidth, winHeight, dom){
+        // let dn = btoa(dom);
+        let dn = dom;
+        // console.log(dn)
+        if(typeof window.imgMap == 'undefined') window.imgMap = [];
+        if(typeof window.imgMap[dn] == 'undefined'){
+            window.imgMap[dn] = {
+                x: imgWidth / parseFloat($(dom).css('left')),
+                y: imgHeight / parseFloat($(dom).css('top')),
+                w: imgWidth / parseFloat($(dom).css('width')),
+                h: imgHeight / parseFloat($(dom).css('height'))
+            }
+        }
+        let pp = imgHeight / imgWidth; 
+        let reWidth =  winWidth;
+        let reHeight =  winWidth * pp;
+
+        $(dom).css('left', (reWidth / imgMap[dn].x) +'px');
+        $(dom).css('top', (reHeight / imgMap[dn].y) +'px');
+        $(dom).css('width', (reWidth / imgMap[dn].w) +'px');
+        $(dom).css('height', (reHeight / imgMap[dn].h) +'px');
+    }
+
+</script>
