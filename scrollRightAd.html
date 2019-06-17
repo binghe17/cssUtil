@@ -1,0 +1,27 @@
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-cookie/1.4.1/jquery.cookie.min.js"></script>
+<div id="scrollRightAdBox">
+	<a href="/member/join.html"><img src="https://semvill.diskn.com/baner/addonshop/LUCKY/6%EC%9B%94/%ED%9A%8C%EC%9B%90%EA%B0%80%EC%9E%85_icon.png" /></a>
+    
+</div>
+<style>
+    body {height:10000px;}
+    #scrollRightAdBox { position: fixed; display: none; right: 10px; bottom: 20%; z-index: 100; }
+    /*#scrollRightAdBox img { background-color: white; box-shadow: 1px 1px 2px -1px black; border-radius: 7%; }*/
+    #scrollRightAdBox .close { position: absolute; top: 0px; right: 0px; padding: 4px 4px 9px 9px; text-align: right; line-height: 5px; width: 10px; height: 10px; /* background: #fff; */ /* border-radius: 50%; */  color: #000; cursor: pointer; text-shadow: 1px 1px 1px white;}
+	#scrollRightAdBox .close:hover { font-weight:bold; }
+</style>
+<script>
+$(function(){
+    if($.cookie('scrollRightAdBox_PC') == '1') {
+        // console.log('111111')
+    } else {
+        $('#scrollRightAdBox').css('display', 'block');
+        $('#scrollRightAdBox').append('<div class="close">x</div>');
+        $('#scrollRightAdBox .close').click(function(){
+            $(this).parent().hide();
+            $.cookie('scrollRightAdBox_PC', '1', { expires: 1, path: '/' });
+        }); 
+    }
+});
+</script>
